@@ -3,13 +3,14 @@ import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:weather/core/api_client/api_client.dart';
+import 'package:weather/feature/home/byhour/dto/hour_response.dart';
 import 'package:weather/feature/home/location/dto/result/weather_response_result.dart';
 import 'package:weather/feature/home/location/dto/weather_response.dart';
 
 class HomeProvider extends ChangeNotifier {
   ApiClient _apiClient = ApiClient(Dio());
   late WeatherResponse _weather;
-  // late HourResponse _byHour;
+  late HourResponse _byHour;
   List _list = [];
   double? _lat = 35.7367808;
   double? _long = 51.4228224;
@@ -25,6 +26,7 @@ class HomeProvider extends ChangeNotifier {
 
 
   Future<bool> sendToApi() async {
+
     var _resultLocation = await _apiClient.location({"lat": _lat, "lng": _long},
         "service.rsczuYOA7OikWOXhn4d4CMQE0pI3lsePqulp25CK");
     _city = _resultLocation['state'];
@@ -41,12 +43,14 @@ class HomeProvider extends ChangeNotifier {
     };
     _weather = await _apiClient.getWeather(_mapWeather);
 
-    // Map<String, dynamic> _mapByHour = {
-    //   "token": "987231:618cd826e8c5d1.13098129",
-    //   "action": 'byhour',
-    //   "city": city
-    // };
-    // _byHour = await _apiClient.getWeatherByHour(_mapByHour);
+
+    getDetail();
+    Map<String, dynamic> _mapByHour = {
+      "token": "987231:618cd826e8c5d1.13098129",
+      "action": 'byhour',
+      "city": city
+    };
+    _byHour = await _apiClient.getWeatherByHour(_mapByHour);
     return true;
   }
 
@@ -64,7 +68,18 @@ class HomeProvider extends ChangeNotifier {
     }
   }
 
+  void getDetail(){
+    _list.add(weather.wind.speed);
+    _list.add(weather.main.humidity);
+    _list.add(weather.main.tempMax);
+    _list.add(weather.main.pressure);
+    _list.add(weather.visibility);
+    _list.add(weather.main.tempMin);
+  }
+
   WeatherResponseResult get weather => _weather.result;
+
+  HourResponse get byHour => _byHour;
 
   String? get city => _city;
 

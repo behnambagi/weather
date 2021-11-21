@@ -9,6 +9,7 @@ class RulesScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     var stateRule = Provider.of<HomeProvider>(context);
     return Scaffold(
+      appBar: AppBar(),
       body: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 20.0),
         child: Center(

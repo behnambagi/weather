@@ -4,6 +4,7 @@ import 'package:weather/core/init_value.dart';
 import 'package:weather/feature/home/provider/home_provider.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:weather/feature/home/widgets/Detail_widget.dart';
+import 'package:weather/feature/home/widgets/item_widget.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({Key? key}) : super(key: key);
@@ -11,7 +12,7 @@ class HomeScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     var weather = Provider.of<HomeProvider>(context).weather;
-    var list = Provider.of<HomeProvider>(context).list;
+    var byHour = Provider.of<HomeProvider>(context).byHour;
 
     return Scaffold(
       backgroundColor: Colors.white,
@@ -43,23 +44,38 @@ class HomeScreen extends StatelessWidget {
                 style: TextStyle(fontSize: 85),
               ),
               Text(
-                "شما احساس ميكنيد" + "°C" +
+                "شما احساس ميكنيد" +
+                    "°C" +
                     weather.main.feelsLike.toStringAsFixed(0),
                 style: TextStyle(fontSize: 20),
               ),
               Container(
-                width: 327,
-                height: 163,
-                decoration: BoxDecoration(
-                    borderRadius: BorderRadius.all(Radius.circular(11)),
-                    color: const Color(0xfffdfcfc)),
-                child: GridView.builder(
-                  itemCount: list.length,
+                height: 175,
+                child: ListView.builder(
+                  itemCount: byHour.result.list.length,
+                  scrollDirection: Axis.horizontal,
                   itemBuilder: (BuildContext context, int index) {
-                    return DetailWidget(index: index);
+                    return ItemWidget(index: index);
                   },
-                  gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                      crossAxisCount: 3),
+                ),
+              ),
+              SizedBox(height: 3),
+              Container(
+                margin: EdgeInsets.symmetric(horizontal: 8),
+                height: 120,
+                decoration: BoxDecoration(
+                    borderRadius: BorderRadius.all(Radius.circular(25)),
+                    color: const Color(0xffCDC7C5)),
+                child: Padding(
+                  padding: const EdgeInsets.only(right: 20.0),
+                  child: GridView.builder(
+                    itemCount: 6,
+                    itemBuilder: (BuildContext context, int index) {
+                      return DetailWidget(index: index);
+                    },
+                    gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                        crossAxisCount: 3, childAspectRatio: 3),
+                  ),
                 ),
               ),
             ],
