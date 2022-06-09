@@ -1,81 +1,119 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:weather/core/init_value.dart';
-import 'package:weather/feature/home/provider/home_provider.dart';
-import 'package:flutter_svg/flutter_svg.dart';
-import 'package:weather/feature/home/widgets/Detail_widget.dart';
-import 'package:weather/feature/home/widgets/item_widget.dart';
+import 'package:intl/intl.dart' as intl;
+import '../../../core/enums/enums.dart';
+import '../../../core/images/image_widget.dart';
+import '../../../core/images/images.dart';
+import '../../location/screen/location_screen.dart';
+import '../provider/home_provider.dart';
+import '../widgets/smart_future_builder.dart';
+import '../widgets/text_gradient.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    var weather = Provider.of<HomeProvider>(context).weather;
-    var byHour = Provider.of<HomeProvider>(context).byHour;
-
-    return Scaffold(
-      backgroundColor: Colors.white,
-      body: SingleChildScrollView(
-        child: Center(
-          child: Column(
+    var s = MediaQuery.of(context).size;
+    var provider = Provider.of<HomeProvider>(context);
+    return SingleChildScrollView(
+      child: Center(
+        child: SmartFutureBuilder(
+          future: provider.futureInitHome,
+          widget: (v) => Column(
+            mainAxisAlignment: MainAxisAlignment.end,
             children: [
               SizedBox(
-                height: 44,
-              ),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Image.network(
-                      "http://openweathermap.org/img/wn/${weather.weather[0].icon}@2x.png"),
-                  Text(weather.weather[0].description)
-                ],
-              ),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Text(InitValue.myCity,
-                      style: TextStyle(fontSize: 35, fontFamily: 'font')),
-                  SvgPicture.asset('images/vector.svg')
-                ],
-              ),
-              Text(
-                weather.main.temp.toStringAsFixed(0) + "°C",
-                style: TextStyle(fontSize: 85),
-              ),
-              Text(
-                "شما احساس ميكنيد" +
-                    "°C" +
-                    weather.main.feelsLike.toStringAsFixed(0),
-                style: TextStyle(fontSize: 20),
-              ),
-              Container(
-                height: 175,
-                child: ListView.builder(
-                  itemCount: byHour.result.list.length,
-                  scrollDirection: Axis.horizontal,
-                  itemBuilder: (BuildContext context, int index) {
-                    return ItemWidget(index: index);
-                  },
-                ),
-              ),
-              SizedBox(height: 3),
-              Container(
-                margin: EdgeInsets.symmetric(horizontal: 8),
-                height: 120,
-                decoration: BoxDecoration(
-                    borderRadius: BorderRadius.all(Radius.circular(25)),
-                    color: const Color(0xffCDC7C5)),
-                child: Padding(
-                  padding: const EdgeInsets.only(right: 20.0),
-                  child: GridView.builder(
-                    itemCount: 6,
-                    itemBuilder: (BuildContext context, int index) {
-                      return DetailWidget(index: index);
-                    },
-                    gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                        crossAxisCount: 3, childAspectRatio: 3),
-                  ),
+                width: double.infinity,
+                height: s.height-60,
+                child: Stack(
+                  children: [
+                    PositionedDirectional(
+                        width: s.width,
+                        top: 100,
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            ImageBlur(ImageAsset(
+                                provider.weather.weatherIcon??"",
+                                asset: AssetEnum.weatherIcon),
+                                type: TypeFileEnum.png, height: 290),
+                          ],
+                        )) ,
+                    Container(
+                      alignment: AlignmentDirectional.topEnd,
+                      margin: const EdgeInsetsDirectional.only(end: 40, top: 20),
+                      child: Row(
+                        children: [
+                          SizedBox(width: s.width*0.088),
+                          const Icon(Icons.location_on_outlined),
+                          const Spacer(),
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.end,
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Text(intl.DateFormat.yMMMd().format(DateTime.now()),
+                                  style: TextStyle(
+                                      fontWeight: FontWeight.w400,
+                                      fontSize: 18,
+                                      color: Colors.grey.shade500)),
+                              Row(
+                                children: [
+                                  IconButton(
+                                      icon: const Icon(Icons.edit, size: 20),
+                                      onPressed: ()=>Navigator.of(context).
+                                      push( MaterialPageRoute(
+                                          builder: (BuildContext context) {
+                                            return const LocationScreen(weather: false,);
+                                          }))),
+                                  const Text("Tehran", style: TextStyle(
+                                      fontWeight: FontWeight.bold, fontSize: 48),
+                                  ),
+                                ],
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
+                    ),
+
+                    Positioned.directional(
+                      end: 0,
+                      bottom: 0,
+                      textDirection: TextDirection.rtl,
+                      child: Container(
+                        padding: const EdgeInsetsDirectional.only(end: 50),
+                        alignment: AlignmentDirectional.topEnd,
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.end,
+                          children: [
+                            GradientText(
+                              "${provider.weather.temperature?.celsius?.round()}°",
+                              style: const TextStyle(
+                                  fontSize: 135, fontWeight: FontWeight.bold),
+                              gradient: const LinearGradient(
+                                  colors: [
+                                    Colors.black,
+                                    Colors.black45,
+                                  ],
+                                  end: Alignment.bottomCenter,
+                                  begin: Alignment.topCenter),
+                            ),
+                            const SizedBox(height: 20),
+                            Align(
+                                alignment: AlignmentDirectional.topEnd,
+                                child: Text(
+                                  provider.weather.weatherMain ?? "",
+                                  style: const TextStyle(
+                                      color: Color(0xffFF8E27),
+                                      fontSize: 24,
+                                      fontWeight: FontWeight.bold),
+                                )),
+                          ],
+                        ),
+                      ),
+                    )
+                  ],
                 ),
               ),
             ],

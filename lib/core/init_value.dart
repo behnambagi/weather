@@ -1,19 +1,14 @@
-import 'package:shared_preferences/shared_preferences.dart';
-
+part of utils;
 class InitValue{
+  static String myCity = 'tehran';
+  static String tokenOpenWeather = "f5930c6e7ae40e126b7a409358c5097e";
 
-  InitValue.city(){
-    getLocation();
-  }
-
-  static String myCity = '';
-
-  void getLocation() async{
-   try{
+  static Future<String?> getLocation() async{
      SharedPreferences prefs = await SharedPreferences.getInstance();
+     String? city = prefs.getString('city');
+     if(city==null) return null;
      myCity = prefs.getString('city')!;
-   }catch(e){}
-
+     return myCity;
 }
 
 }

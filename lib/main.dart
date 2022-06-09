@@ -1,18 +1,17 @@
-
-
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:provider/provider.dart';
-import 'package:weather/feature/home/provider/home_provider.dart';
 import 'package:flutter/material.dart';
-import 'package:weather/feature/rules/screen/rules_screen.dart';
-import 'package:weather/feature/splash/screen/splashScreen.dart';
-
-import 'feature/home/screen/home_screen.dart';
+import 'package:weathera_app/core/theme.dart';
+import 'feature/home/provider/home_provider.dart';
+import 'feature/home/screen/home.dart';
+import 'feature/location/provider/location_selector_provider.dart';
+import 'feature/splash/screen/splash_screen.dart';
 
 void main() {
   runApp(MultiProvider(
       providers: [
         ChangeNotifierProvider(create: (_) => HomeProvider()),
+        ChangeNotifierProvider(create: (_) => LocationSelectorProvider()),
         // ChangeNotifierProvider(create: (_) => Weather()),
       ],
       child: const MyApp()));
@@ -29,15 +28,13 @@ class MyApp extends StatelessWidget {
         GlobalWidgetsLocalizations.delegate,
         GlobalCupertinoLocalizations.delegate
       ],
+      theme: AppTheme.basic,
       supportedLocales: const [Locale('fa')],
       debugShowCheckedModeBanner: false,
       initialRoute: '/',
       routes: {
         '/': (context) => const Splash(),
-        '/home': (context) => HomeScreen(),
-        // '/products': (context) => ListProductScreen(),
-        // '/d': (context) => Photos(),
-        // '/detailProduct': (context) => DetailScreen(),
+        '/home': (context) => Home(),
       },
     );
   }

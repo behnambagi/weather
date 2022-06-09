@@ -1,20 +1,23 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
-import 'package:weather/feature/home/provider/home_provider.dart';
 
 class DetailWidget extends StatelessWidget {
-  DetailWidget({Key? key, required this.index}) : super(key: key);
+  DetailWidget({Key? key,
+    required this.index, required this.value}) : super(key: key);
   final int index;
+  final double? value;
   final List _list = ['سرعت باد', 'رطوبت', 'يو وي', 'فشار','درصد ديد', 'نقطه شبنم'];
 
   @override
   Widget build(BuildContext context) {
-    var p = Provider.of<HomeProvider>(context);
-
-    return Row(children: [
-
-      Text(p.list[index].toString() +':'),
-      Text(_list[index]),
-    ],);
+    return SizedBox(
+      width: 150,
+      child:Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Text(_list[index]+':'),
+          Text(value?.toStringAsFixed(2)??"null"),
+        ],
+      )
+    );
   }
 }

@@ -1,87 +1,54 @@
-import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:weather/core/api_client/api_client.dart';
-import 'package:weather/feature/home/byhour/dto/hour_response.dart';
-import 'package:weather/feature/home/location/dto/result/weather_response_result.dart';
-import 'package:weather/feature/home/location/dto/weather_response.dart';
+import 'package:weather/weather.dart';
+import 'package:weathera_app/feature/home/provider/location_controller.dart';
+
+import '../../../core/utils.dart';
 
 class HomeProvider extends ChangeNotifier {
-  ApiClient _apiClient = ApiClient(Dio());
-  late WeatherResponse _weather;
-  late HourResponse _byHour;
-  List _list = [];
-  double? _lat = 35.7367808;
-  double? _long = 51.4228224;
-  String? _city;
+  final _wfClient = WeatherFactory(InitValue.tokenOpenWeather, language: Language.PERSIAN);
+  late Weather _weather;
+  late List<Weather> _fiveDay;
+  final List _list = [];
 
-  void setLocation() async {
-    Position position = await Geolocator.getCurrentPosition(
-        desiredAccuracy: LocationAccuracy.high);
-    _lat = position.latitude;
-    _long = position.longitude;
-    notifyListeners();
+  late Future<bool> futureInitHome = initHome(InitValue.myCity);
+
+  Future<bool> _saveCity(String city)async{
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    return await prefs.setString('city', city);
   }
 
-
   Future<bool> sendToApi() async {
-
-    var _resultLocation = await _apiClient.location({"lat": _lat, "lng": _long},
-        "service.rsczuYOA7OikWOXhn4d4CMQE0pI3lsePqulp25CK");
-    _city = _resultLocation['state'];
-    var _list = _city!.split(' ');
-    _city = _list[1];
-
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    prefs.setString('city', _city!);
-
-    Map<String, dynamic> _mapWeather = {
-      "token": "987231:618cd826e8c5d1.13098129",
-      "action": 'now',
-      "city": city
-    };
-    _weather = await _apiClient.getWeather(_mapWeather);
-
-
-    getDetail();
-    Map<String, dynamic> _mapByHour = {
-      "token": "987231:618cd826e8c5d1.13098129",
-      "action": 'byhour',
-      "city": city
-    };
-    _byHour = await _apiClient.getWeatherByHour(_mapByHour);
+    var controller = LocationController();
+    Position? position = await controller.start();
+    if(position==null) return false;
+    _weather =await _wfClient.currentWeatherByLocation(position.longitude, position.longitude);
+    await _saveCity(weather.areaName??"تهران");
+    notifyListeners();
     return true;
   }
 
-  Future<bool> stateChange(bool _result) async {
-     await Geolocator.getCurrentPosition(desiredAccuracy: LocationAccuracy.high);
-    var _check = await Geolocator.checkPermission();
-    if (_check == LocationPermission.always || _check==LocationPermission.whileInUse) {
-      var _prefs =await SharedPreferences.getInstance();
-      _prefs.setBool('state', _result);
-
-      notifyListeners();
-      return true;
-    } else {
-      return false;
-    }
+  Future<bool> initHome(String city) async {
+    _weather =await _wfClient.currentWeatherByCityName(city);
+    _fiveDay = await _wfClient.fiveDayForecastByCityName(city);
+    await _getDetail();
+    notifyListeners();
+    return true;
   }
 
-  void getDetail(){
-    _list.add(weather.wind.speed);
-    _list.add(weather.main.humidity);
-    _list.add(weather.main.tempMax);
-    _list.add(weather.main.pressure);
-    _list.add(weather.visibility);
-    _list.add(weather.main.tempMin);
+  _getDetail(){
+    _list.add(weather.windSpeed);
+    _list.add(weather.humidity);
+    _list.add(weather.tempMax?.celsius??0.0);
+    _list.add(weather.pressure);
+    _list.add(weather.pressure);
+    _list.add(weather.tempMin?.celsius??0.0);
   }
 
-  WeatherResponseResult get weather => _weather.result;
+  Weather get weather => _weather;
 
-  HourResponse get byHour => _byHour;
-
-  String? get city => _city;
+  List<Weather> get fiveDay => _fiveDay;
 
   List get list => _list;
 }
