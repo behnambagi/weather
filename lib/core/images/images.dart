@@ -1,6 +1,6 @@
 
-import 'package:weathera_app/core/enums/enums.dart';
-import 'package:weathera_app/core/helpers/helpers_app.dart';
+import 'package:weather_app/core/enums/enums.dart';
+import 'package:weather_app/core/helpers/helpers_app.dart';
 
 class ImageAsset{
   final String suffix;

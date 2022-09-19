@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
+import 'package:latlong2/latlong.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:weather/weather.dart';
-import 'package:weathera_app/feature/home/provider/location_controller.dart';
+import 'package:weather_app/feature/home/provider/location_controller.dart';
 
 import '../../../core/utils.dart';
 
@@ -20,10 +21,18 @@ class HomeProvider extends ChangeNotifier {
   }
 
   Future<bool> sendToApi() async {
-    var controller = LocationController();
+    var controller = GPSController();
     Position? position = await controller.start();
     if(position==null) return false;
     _weather =await _wfClient.currentWeatherByLocation(position.longitude, position.longitude);
+    await _saveCity(weather.areaName??"تهران");
+    notifyListeners();
+    return true;
+  }
+
+  Future<bool> findOfLatLong(LatLng latLong) async {
+    _weather =await _wfClient.currentWeatherByLocation(
+        latLong.latitude, latLong.longitude);
     await _saveCity(weather.areaName??"تهران");
     notifyListeners();
     return true;

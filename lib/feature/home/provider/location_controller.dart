@@ -1,6 +1,6 @@
 import 'package:geolocator/geolocator.dart';
 
-class LocationController{
+class GPSController{
   Future<Position> setLocation() async {
     Position position = await Geolocator.getCurrentPosition(
         desiredAccuracy: LocationAccuracy.high);

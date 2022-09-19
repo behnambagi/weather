@@ -2,9 +2,8 @@ library home;
 
 import 'package:flutter/material.dart';
 import 'package:weather/weather.dart';
-import 'package:weathera_app/feature/home/screen/home_screen.dart';
-import 'package:weathera_app/feature/home/widgets/navigation_bottom.dart';
-import 'package:weathera_app/feature/location/screen/location_screen.dart';
+import 'package:weather_app/feature/home/screen/home_screen.dart';
+import 'package:weather_app/feature/home/widgets/navigation_bottom.dart';
 part '../widgets/five_day_widget.dart';
 
 class Home extends StatefulWidget {
@@ -17,7 +16,10 @@ class Home extends StatefulWidget {
 class _HomeState extends State<Home> {
   final List<Widget> items= [
     const HomeScreen(),
-    const LocationScreen(weather: true,)
+    const Center(child: Text("whether")),
+    const Center(child: Text("heart")),
+    const Center(child: Text("profile")),
+    // const LocationScreen(weather: false)
   ];
 
   int selectPage = 0;

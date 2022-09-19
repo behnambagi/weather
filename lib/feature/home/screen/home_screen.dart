@@ -61,12 +61,16 @@ class HomeScreen extends StatelessWidget {
                                 children: [
                                   IconButton(
                                       icon: const Icon(Icons.edit, size: 20),
-                                      onPressed: ()=>Navigator.of(context).
-                                      push( MaterialPageRoute(
+                                      onPressed: ()async{
+                                       var res = await Navigator.of(context).push(
+                                            MaterialPageRoute(
                                           builder: (BuildContext context) {
-                                            return const LocationScreen(weather: false,);
-                                          }))),
-                                  const Text("Tehran", style: TextStyle(
+                                            return const LocationScreen(weather: true);
+                                          }));
+                                       if(res==null) return;
+                                       provider.findOfLatLong(res);
+                                      }),
+                                  Text(provider.weather.areaName??"Tehran", style: const TextStyle(
                                       fontWeight: FontWeight.bold, fontSize: 48),
                                   ),
                                 ],
